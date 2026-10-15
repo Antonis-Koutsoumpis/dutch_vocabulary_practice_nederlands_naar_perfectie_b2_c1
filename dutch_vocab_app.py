@@ -19,19 +19,29 @@ df = load_data(FILE)
 # ---- Sidebar filters ----
 st.sidebar.header("Filters")
 
+# Multi-select for Hoofdstuk
 chapters = ["All"] + sorted(df["Hoofdstuk"].dropna().unique().tolist())
-chapter = st.sidebar.selectbox("Hoofdstuk", chapters)
+chapter_choice = st.sidebar.multiselect(
+    "Hoofdstuk",
+    options=chapters,
+    default=["All"],
+)
 
-if chapter != "All":
-    sub = df[df["Hoofdstuk"] == chapter]
-else:
+if "All" in chapter_choice or not chapter_choice:
     sub = df.copy()
+else:
+    sub = df[df["Hoofdstuk"].isin(chapter_choice)]
 
+# Multi-select for Tekst
 texts = ["All"] + sorted(sub["Tekst"].dropna().unique().tolist())
-text_choice = st.sidebar.selectbox("Tekst", texts)
+text_choice = st.sidebar.multiselect(
+    "Tekst",
+    options=texts,
+    default=["All"],
+)
 
-if text_choice != "All":
-    sub = sub[sub["Tekst"] == text_choice]
+if "All" not in text_choice and text_choice:
+    sub = sub[sub["Tekst"].isin(text_choice)]
 
 # ---- Number of words ----
 max_n = len(sub)
@@ -60,11 +70,9 @@ for i, row in sample.iterrows():
     with st.container(border=True):
         st.markdown(f"### {row['Dutch Word/Phrase']}")
 
-        key = f"rev_{st.session_state.seed}_{i}"
-        if st.button("Show answer", key=key):
-            st.session_state.revealed.add(i)
+        show = st.toggle("Show answer", key=f"toggle_{st.session_state.seed}_{i}")
 
-        if i in st.session_state.revealed:
+        if show:
             st.markdown(f"**English:** {row['English Translation']}")
             st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
             st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
