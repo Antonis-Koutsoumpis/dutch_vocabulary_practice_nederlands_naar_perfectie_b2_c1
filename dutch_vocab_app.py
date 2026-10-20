@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import random
 
-st.set_page_config(page_title="Dutch Vocab Flashcards", layout="centered")
-st.title("🇳🇱 Dutch Vocabulary Flashcards")
+st.set_page_config(page_title="Dutch Vocab Flashcards - Nederlands naar Perfectie (B2–C1)", layout="centered")
+st.title("🇳🇱 Dutch Vocabulary Flashcards - Nederlands naar Perfectie (B2–C1)")
 
 # ---- Load data ----
 @st.cache_data
