@@ -3,6 +3,8 @@
 An interactive flashcard app for practicing Dutch vocabulary from the textbook
 *Nederlands naar Perfectie* (levels B2 to C1).
 
+This repository is linked to the Streamlit app [Dutch Vocabulary Flashcards](https://dutch-vocab-practice.streamlit.app/).
+
 ## What it does
 
 - Presents Dutch words and phrases as individual flashcards
