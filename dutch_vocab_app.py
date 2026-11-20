@@ -1,9 +1,35 @@
 import streamlit as st
 import pandas as pd
 import random
+import re
+from urllib.parse import quote
 
 st.set_page_config(page_title="Dutch Vocab Flashcards - Nederlands naar Perfectie (B2–C1)", layout="centered")
 st.title("🇳🇱 Dutch Vocabulary Flashcards - Nederlands naar Perfectie (B2–C1)")
+
+# ---- YouGlish: hear the word in real conversations ----
+def youglish_query(text) -> str:
+    """Search phrase for YouGlish: the first alternative, without notes in brackets.
+    'onder druk staan/zetten' -> 'onder druk staan', 'aanscherpen (sep.)' -> 'aanscherpen',
+    'de afkeer (van)' -> 'afkeer'."""
+    t = re.sub(r"^\s*ook:\s*", "", str(text))
+    t = re.sub(r"(?<=\S )\((\w+)\)(?= \S)", r"\1", t)    # 'op (zichzelf) aangewezen zijn': keep the word
+    t = re.sub(r"\([^)]*\)|\[[^\]]*\]", "", t)            # other notes in brackets
+    t = re.split(r"\s+/\s*|\s*/\s+|\n|,|;", t)[0]        # first of several alternatives
+    prev = None
+    while prev != t:                                      # 'staan/zetten' -> 'staan'
+        prev, t = t, re.sub(r"([\w'-]+)/\s*[\w'.…-]+", r"\1", t)
+    t = re.sub(r"\.\.\.|…", " ", t)
+    t = re.sub(r"\s+", " ", t).strip(" .")
+    return re.sub(r"^(de|het) (?=\S+$)", "", t)           # 'de nuance' -> 'nuance'
+
+
+def youglish_link(text):
+    """Link to YouGlish with Dutch as spoken in the Netherlands (NL, not BE)."""
+    q = youglish_query(text)
+    st.markdown(f"[🎧 Hear it in real conversations (YouGlish, NL)](https://youglish.com/pronounce/{quote(q, safe='')}/dutch/nl)"
+                + (" · results for phrases may be inaccurate" if " " in q else ""))
+
 
 # ---- Load data ----
 @st.cache_data
@@ -80,6 +106,7 @@ with tab_nl:
                 st.markdown(f"**English:** {row['English Translation']}")
                 st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
                 st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
+                youglish_link(row["Dutch Word/Phrase"])
 
 # ---- Cards: English -> Dutch ----
 with tab_en:
@@ -95,3 +122,4 @@ with tab_en:
                 st.markdown(f"**Dutch:** {row['Dutch Word/Phrase']}")
                 st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
                 st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
+                youglish_link(row["Dutch Word/Phrase"])

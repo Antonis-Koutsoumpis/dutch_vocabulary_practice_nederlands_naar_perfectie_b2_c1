@@ -15,6 +15,7 @@ This repository is linked to two versions of the app, with the same words and fe
 - Lets you filter by **Hoofdstuk** (chapter) and **Tekst** (text)
 - Lets you choose how many words to practice: 5, 10, 20, or all
 - Reveals the English translation and an example Dutch sentence on demand
+- Links every word or phrase to [YouGlish](https://youglish.com/dutch) (Dutch as spoken in the Netherlands, *NL*), to hear it in real conversations. Notes in brackets and alternatives are left out of the search (*onder druk staan/zetten* searches *onder druk staan*); results for longer phrases may be less accurate
 - Shuffles a fresh random selection with the **New set** button
 
 ## Who it's for

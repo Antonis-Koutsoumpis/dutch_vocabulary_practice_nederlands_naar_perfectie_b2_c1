@@ -5,6 +5,24 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
+/** Search phrase for YouGlish (same as youglish_query() in dutch_vocab_app.py): the first
+ * alternative, without notes in brackets. "onder druk staan/zetten" -> "onder druk staan". */
+function youglishQuery(text) {
+  let t = String(text).replace(/^\s*ook:\s*/, "");
+  t = t.replace(/(\S )\(([\p{L}\p{N}_]+)\)(?= \S)/gu, "$1$2");      // "op (zichzelf) aangewezen": keep the word
+  t = t.replace(/\([^)]*\)|\[[^\]]*\]/g, "");                        // other notes in brackets
+  t = t.split(/\s+\/\s*|\s*\/\s+|\n|,|;/)[0];                       // first of several alternatives
+  let prev = null;
+  while (prev !== t) { prev = t; t = t.replace(/([\p{L}\p{N}_'-]+)\/\s*[\p{L}\p{N}_'.…-]+/u, "$1"); }   // staan/zetten -> staan
+  t = t.replace(/\.\.\.|…/g, " ").replace(/\s+/g, " ").replace(/^[ .]+|[ .]+$/g, "");
+  return t.replace(/^(de|het) (?=\S+$)/, "");                           // "de nuance" -> "nuance"
+}
+/** YouGlish with Dutch as spoken in the Netherlands (NL, not BE). */
+function youglishLink(text) {
+  const q = youglishQuery(text);
+  return `<p><a href="https://youglish.com/pronounce/${encodeURIComponent(q)}/dutch/nl" target="_blank" rel="noopener">🎧 Hear it in real conversations (YouGlish, NL)</a>${q.includes(" ") ? ` <span class="caption">· results for phrases may be inaccurate</span>` : ""}</p>`;
+}
+
 let ROWS = [];
 const N_OPTIONS = ["5", "10", "20", "All"];
 let S = { h: [], t: [], n: "5" };
@@ -34,6 +52,7 @@ function card(r) {
       <p><strong>${en ? "Dutch" : "English"}:</strong> ${esc(en ? r.nl : r.en)}</p>
       <p><strong>Voorbeeldzin:</strong> ${esc(r.ex)}</p>
       <p class="ex-en"><em>${esc(r.ex_en)}</em></p>
+      ${youglishLink(r.nl)}
     </div>`;
   const btn = el.querySelector(".toggle"), ans = el.querySelector(".answer");
   el._set = (v) => { ans.hidden = !v; btn.textContent = v ? "Hide answer" : "Show answer"; btn.classList.toggle("primary", !v); };
