@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dutch Vocab Flashcards – Nederlands naar Perfectie (B2–C1)</title>
+<meta name="description" content="Flashcards for the vocabulary of Nederlands naar Perfectie (B2–C1).">
+<meta name="theme-color" content="#1f4e8c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NnP B2–C1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <button id="menuBtn" class="icon-btn" aria-label="Filters" aria-controls="settings" aria-expanded="false">
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <span class="menu-label">Filters</span>
+  </button>
+  <h1>🇳🇱 Dutch Vocab · Nederlands naar Perfectie B2–C1</h1>
+  <span id="filterCount" class="badge" hidden></span>
+</header>
+
+<div class="layout">
+  <aside id="settings" class="settings" aria-label="Filters">
+    <div class="settings-head">
+      <h2>Filters</h2>
+      <button id="closeSettings" class="icon-btn close" aria-label="Close filters">✕</button>
+    </div>
+    <div class="field">Hoofdstuk <div class="chips" id="f-h"></div></div>
+    <div class="field">Tekst <div class="chips" id="f-t"></div></div>
+    <p class="hint">Nothing selected = all.</p>
+    <div class="field">Number of words <div class="chips" id="f-n"></div></div>
+    <button id="resetFilters" class="btn ghost full">Reset filters</button>
+    <button id="applySettings" class="btn primary full only-mobile">Show cards</button>
+  </aside>
+  <div id="backdrop" class="backdrop" hidden></div>
+
+  <main id="main">
+    <div id="out"></div>
+    <div id="loading" class="loading">Loading words…</div>
+    <footer class="footer">
+      Vocabulary from the textbook <em>Nederlands naar Perfectie</em> (B2–C1). ·
+      <a href="https://github.com/Antonis-Koutsoumpis/dutch_vocabulary_practice_nederlands_naar_perfectie_b2_c1">GitHub</a>
+    </footer>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -3,7 +3,10 @@
 An interactive flashcard app for practicing Dutch vocabulary from the textbook
 *Nederlands naar Perfectie* (levels B2 to C1).
 
-This repository is linked to the Streamlit app [Dutch Vocabulary Flashcards](https://dutch-vocab-practice.streamlit.app/).
+This repository is linked to two versions of the app, with the same words and features:
+
+- **Web app (works on phones and desktop):** [Dutch Vocabulary Flashcards (GitHub Pages)](https://antonis-koutsoumpis.github.io/dutch_vocabulary_practice_nederlands_naar_perfectie_b2_c1/). It can be installed on a phone's home screen (iPhone: *Share → Add to Home Screen*; Android: menu ⋮ → *Install app*) and works offline after the first visit.
+- **Streamlit app:** [Dutch Vocabulary Flashcards](https://dutch-vocab-practice.streamlit.app/).
 
 ## What it does
 
@@ -26,8 +29,15 @@ randomized way to drill vocabulary — on laptop or phone.
 4. Click **Show answer** on each card to reveal the translation and example sentence
 5. Click **🔀 New set** anytime for a fresh random selection
 
+## Web app (GitHub Pages)
+
+The web app lives in `docs/` (plain HTML, CSS and JavaScript). Its word list, `docs/data/words.json`, is made from the Excel file by `scripts/export_web.py`. The GitHub Action `.github/workflows/web-data.yml` runs that script whenever the Excel file changes, so both apps always show the same words.
+
+To publish it: in the repository on GitHub go to **Settings → Pages**, choose **Deploy from a branch**, branch **main**, folder **/docs**, and save.
+
 ## Built with
 
 - [Streamlit](https://streamlit.io) — app framework
 - [pandas](https://pandas.pydata.org) — data handling
+- Plain HTML, CSS and JavaScript — web app
 - Vocabulary source: *Nederlands naar Perfectie* (B2–C1)

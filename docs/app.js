@@ -1,0 +1,99 @@
+/* Web version of the Streamlit app (dutch_vocab_app.py): same filters and cards.
+ * The data (data/words.json) is generated from the Excel file by scripts/export_web.py. */
+"use strict";
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+let ROWS = [];
+const N_OPTIONS = ["5", "10", "20", "All"];
+let S = { h: [], t: [], n: "5" };
+try { Object.assign(S, JSON.parse(localStorage.getItem("nnp-settings") || "{}")); } catch (e) { /* ignore */ }
+const save = () => { try { localStorage.setItem("nnp-settings", JSON.stringify(S)); } catch (e) { /* ignore */ } };
+let deck = [];
+
+function matching() {
+  return ROWS.filter((r) => (!S.h.length || S.h.includes(r.h)) && (!S.t.length || S.t.includes(r.t)));
+}
+function newSet() {
+  const m = matching();
+  const n = S.n === "All" ? m.length : Math.min(+S.n, m.length);
+  deck = shuffle(m.slice()).slice(0, n);
+  render();
+}
+
+function card(r) {
+  const el = document.createElement("article");
+  el.className = "card";
+  el.innerHTML = `<div class="card-head"><h3>${esc(r.nl)}</h3><span class="meta">H${r.h} · T${r.t}</span></div>
+    <button class="btn toggle primary">Show answer</button>
+    <div class="answer" hidden>
+      <p><strong>English:</strong> ${esc(r.en)}</p>
+      <p><strong>Voorbeeldzin:</strong> ${esc(r.ex)}</p>
+      <p class="ex-en"><em>${esc(r.ex_en)}</em></p>
+    </div>`;
+  const btn = el.querySelector(".toggle"), ans = el.querySelector(".answer");
+  el._set = (v) => { ans.hidden = !v; btn.textContent = v ? "Hide answer" : "Show answer"; btn.classList.toggle("primary", !v); };
+  btn.onclick = () => el._set(ans.hidden);
+  return el;
+}
+
+function render() {
+  const out = $("#out");
+  const total = matching().length;
+  out.innerHTML = `<p class="caption">Showing ${deck.length} of ${total} matching entries.</p>`;
+  if (!deck.length) { out.insertAdjacentHTML("beforeend", `<div class="notice warn-box">No words match these filters.</div>`); return; }
+  const bar = document.createElement("div"); bar.className = "toolbar";
+  bar.innerHTML = `<button class="btn">🔀 New set</button><button class="btn">Show all</button><button class="btn">Hide all</button>`;
+  out.appendChild(bar);
+  const grid = document.createElement("div"); grid.className = "cards";
+  const cards = deck.map(card); cards.forEach((c) => grid.appendChild(c));
+  out.appendChild(grid);
+  const [a, b, c] = bar.querySelectorAll("button");
+  a.onclick = newSet; b.onclick = () => cards.forEach((x) => x._set(true)); c.onclick = () => cards.forEach((x) => x._set(false));
+  const n = (S.h.length ? 1 : 0) + (S.t.length ? 1 : 0);
+  $("#filterCount").hidden = !n; $("#filterCount").textContent = `${n} filter${n > 1 ? "s" : ""}`;
+}
+
+function chips(id, key, values, single = false, label = (v) => v) {
+  const box = $(id); box.innerHTML = "";
+  for (const v of values) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = label(v);
+    const on = () => single ? S[key] === v : S[key].includes(v);
+    b.setAttribute("aria-pressed", on());
+    b.onclick = () => {
+      if (single) S[key] = v;
+      else S[key] = S[key].includes(v) ? S[key].filter((x) => x !== v) : [...S[key], v];
+      box.querySelectorAll(".chip").forEach((c, i) => c.setAttribute("aria-pressed", single ? S[key] === values[i] : S[key].includes(values[i])));
+      save(); newSet();
+    };
+    box.appendChild(b);
+  }
+}
+const uniq = (k) => [...new Set(ROWS.map((r) => r[k]))].sort((a, b) => a - b);
+function buildFilters() {
+  chips("#f-h", "h", uniq("h"), false, (v) => `Hoofdstuk ${v}`);
+  chips("#f-t", "t", uniq("t"), false, (v) => `Tekst ${v}`);
+  chips("#f-n", "n", N_OPTIONS, true);
+}
+function openSettings(open) {
+  $("#settings").classList.toggle("open", open);
+  $("#backdrop").hidden = !open;
+  $("#menuBtn").setAttribute("aria-expanded", open);
+}
+
+fetch("data/words.json").then((r) => r.json()).then((rows) => {
+  ROWS = rows;
+  S.h = S.h.filter((v) => rows.some((r) => r.h === v)); S.t = S.t.filter((v) => rows.some((r) => r.t === v));
+  if (!N_OPTIONS.includes(S.n)) S.n = "5";
+  $("#loading").hidden = true;
+  buildFilters();
+  $("#menuBtn").onclick = () => openSettings(true);
+  $("#closeSettings").onclick = $("#backdrop").onclick = $("#applySettings").onclick = () => openSettings(false);
+  $("#resetFilters").onclick = () => { S = { h: [], t: [], n: "5" }; save(); buildFilters(); newSet(); };
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") openSettings(false); });
+  newSet();
+}).catch(() => { $("#loading").textContent = "Could not load the word list. Check your connection and reload."; });
+
+if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
