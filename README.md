@@ -11,7 +11,7 @@ This repository is linked to two versions of the app, with the same words and fe
 ## What it does
 
 - Presents Dutch words and phrases as individual flashcards (tab **Dutch → English**)
-- Also practices the other way round (tab **English → Dutch**): the card shows the English meaning and you think of the Dutch word or phrase
+- Also practices the other way round (tab **English → Dutch**): the card shows the English meaning with an English example sentence for context, and you think of the Dutch word or phrase
 - Lets you filter by **Hoofdstuk** (chapter) and **Tekst** (text)
 - Lets you choose how many words to practice: 5, 10, 20, or all
 - Reveals the English translation and an example Dutch sentence on demand

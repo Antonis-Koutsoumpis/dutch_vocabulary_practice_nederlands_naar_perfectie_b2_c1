@@ -46,12 +46,15 @@ function card(r) {
   const el = document.createElement("article");
   el.className = "card";
   const en = dir === "en";
+  // English -> Dutch: the English example sentence goes on the front as context
+  // (only once: it is not repeated in the answer).
   el.innerHTML = `<div class="card-head"><h3>${esc(en ? r.en : r.nl)}</h3><span class="meta">H${r.h} · T${r.t}</span></div>
+    ${en ? `<p class="caption"><em>e.g. ${esc(r.ex_en)}</em></p>` : ""}
     <button class="btn toggle primary">Show answer</button>
     <div class="answer" hidden>
       <p><strong>${en ? "Dutch" : "English"}:</strong> ${esc(en ? r.nl : r.en)}</p>
       <p><strong>Voorbeeldzin:</strong> ${esc(r.ex)}</p>
-      <p class="ex-en"><em>${esc(r.ex_en)}</em></p>
+      ${en ? "" : `<p class="ex-en"><em>${esc(r.ex_en)}</em></p>`}
       ${youglishLink(r.nl)}
     </div>`;
   const btn = el.querySelector(".toggle"), ans = el.querySelector(".answer");

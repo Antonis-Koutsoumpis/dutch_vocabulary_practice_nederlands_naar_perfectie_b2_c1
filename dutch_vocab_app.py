@@ -115,11 +115,13 @@ with tab_en:
     for i, row in sample_en.iterrows():
         with st.container(border=True):
             st.markdown(f"### {row['English Translation']}")
+            # The English example sentence gives context (the Dutch one would give the answer away)
+            example_en = re.sub(r"^\s*-\s*", "", str(row["Literary English Translation (for back translation)"]))
+            st.markdown(f"*e.g. {example_en}*")
 
             show = st.toggle("Show answer", key=f"toggle_en_{st.session_state.seed}_{i}")
 
             if show:
                 st.markdown(f"**Dutch:** {row['Dutch Word/Phrase']}")
                 st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
-                st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
                 youglish_link(row["Dutch Word/Phrase"])
