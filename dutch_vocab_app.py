@@ -31,6 +31,16 @@ def youglish_link(text):
                 + (" · results for phrases may be inaccurate" if " " in q else ""))
 
 
+GOOGLE_TOPICS = "translation, break down word/phrase logic, etymology, synonyms, examples"
+
+
+def google_link(text):
+    """Google search for the word or phrase as written in the list, plus GOOGLE_TOPICS."""
+    q = f"{' '.join(str(text).split())} {GOOGLE_TOPICS}"
+    st.markdown(f"[🔎 Search on Google (translation, word logic, etymology, synonyms, examples)]"
+                f"(https://www.google.com/search?q={quote(q, safe='')})")
+
+
 # ---- Load data ----
 @st.cache_data
 def load_data(path):
@@ -107,6 +117,7 @@ with tab_nl:
                 st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
                 st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
                 youglish_link(row["Dutch Word/Phrase"])
+                google_link(row["Dutch Word/Phrase"])
 
 # ---- Cards: English -> Dutch ----
 with tab_en:
@@ -125,3 +136,4 @@ with tab_en:
                 st.markdown(f"**Dutch:** {row['Dutch Word/Phrase']}")
                 st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
                 youglish_link(row["Dutch Word/Phrase"])
+                google_link(row["Dutch Word/Phrase"])

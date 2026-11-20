@@ -23,6 +23,13 @@ function youglishLink(text) {
   return `<p><a href="https://youglish.com/pronounce/${encodeURIComponent(q)}/dutch/nl" target="_blank" rel="noopener">🎧 Hear it in real conversations (YouGlish, NL)</a>${q.includes(" ") ? ` <span class="caption">· results for phrases may be inaccurate</span>` : ""}</p>`;
 }
 
+const GOOGLE_TOPICS = "translation, break down word/phrase logic, etymology, synonyms, examples";
+/** Google search for the word or phrase as written in the list, plus GOOGLE_TOPICS. */
+function googleLink(text) {
+  const q = `${String(text).split(/\s+/).filter(Boolean).join(" ")} ${GOOGLE_TOPICS}`;
+  return `<p><a href="https://www.google.com/search?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">🔎 Search on Google (translation, word logic, etymology, synonyms, examples)</a></p>`;
+}
+
 let ROWS = [];
 const N_OPTIONS = ["5", "10", "20", "All"];
 let S = { h: [], t: [], n: "5" };
@@ -56,6 +63,7 @@ function card(r) {
       <p><strong>Voorbeeldzin:</strong> ${esc(r.ex)}</p>
       ${en ? "" : `<p class="ex-en"><em>${esc(r.ex_en)}</em></p>`}
       ${youglishLink(r.nl)}
+      ${googleLink(r.nl)}
     </div>`;
   const btn = el.querySelector(".toggle"), ans = el.querySelector(".answer");
   el._set = (v) => { ans.hidden = !v; btn.textContent = v ? "Hide answer" : "Show answer"; btn.classList.toggle("primary", !v); };

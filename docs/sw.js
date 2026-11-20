@@ -1,7 +1,7 @@
 /* Service worker: makes the app work offline and installable.
  * Strategy: serve from cache right away, update the cache in the background
  * (so a new word list shows up on the next visit). */
-const CACHE = "nnp-v4";
+const CACHE = "nnp-v5";
 const FILES = ["./", "index.html", "style.css", "app.js", "manifest.webmanifest",
   "data/words.json", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
