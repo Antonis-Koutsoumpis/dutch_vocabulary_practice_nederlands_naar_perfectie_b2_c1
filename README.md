@@ -10,7 +10,8 @@ This repository is linked to two versions of the app, with the same words and fe
 
 ## What it does
 
-- Presents Dutch words and phrases as individual flashcards
+- Presents Dutch words and phrases as individual flashcards (tab **Dutch → English**)
+- Also practices the other way round (tab **English → Dutch**): the card shows the English meaning and you think of the Dutch word or phrase
 - Lets you filter by **Hoofdstuk** (chapter) and **Tekst** (text)
 - Lets you choose how many words to practice: 5, 10, 20, or all
 - Reveals the English translation and an example Dutch sentence on demand
@@ -26,8 +27,9 @@ randomized way to drill vocabulary — on laptop or phone.
 1. Open the app link
 2. In the sidebar, pick a chapter and text (or leave both on "All")
 3. Choose how many words you want (5 / 10 / 20 / All)
-4. Click **Show answer** on each card to reveal the translation and example sentence
-5. Click **🔀 New set** anytime for a fresh random selection
+4. Choose a tab: **Dutch → English** or **English → Dutch**
+5. Click **Show answer** on each card to reveal the translation and example sentence
+6. Click **🔀 New set** anytime for a fresh random selection
 
 ## Web app (GitHub Pages)
 

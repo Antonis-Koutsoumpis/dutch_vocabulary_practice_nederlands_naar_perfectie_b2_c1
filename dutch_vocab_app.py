@@ -62,17 +62,36 @@ if st.sidebar.button("🔀 New set"):
 
 # Deterministic sample per seed so cards stay stable while reviewing
 sample = sub.sample(n=n, random_state=st.session_state.seed).reset_index(drop=True)
+# The English -> Dutch tab gets its own random selection from the same filters
+sample_en = sub.sample(n=n, random_state=st.session_state.seed + 100_000).reset_index(drop=True)
 
-st.caption(f"Showing {len(sample)} of {max_n} matching entries.")
+tab_nl, tab_en = st.tabs(["🇳🇱 Dutch → English", "🇬🇧 English → Dutch"])
 
-# ---- Cards ----
-for i, row in sample.iterrows():
-    with st.container(border=True):
-        st.markdown(f"### {row['Dutch Word/Phrase']}")
+# ---- Cards: Dutch -> English ----
+with tab_nl:
+    st.caption(f"Showing {len(sample)} of {max_n} matching entries.")
+    for i, row in sample.iterrows():
+        with st.container(border=True):
+            st.markdown(f"### {row['Dutch Word/Phrase']}")
 
-        show = st.toggle("Show answer", key=f"toggle_{st.session_state.seed}_{i}")
+            show = st.toggle("Show answer", key=f"toggle_{st.session_state.seed}_{i}")
 
-        if show:
-            st.markdown(f"**English:** {row['English Translation']}")
-            st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
-            st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
+            if show:
+                st.markdown(f"**English:** {row['English Translation']}")
+                st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
+                st.markdown(f"*{row['Literary English Translation (for back translation)']}*")
+
+# ---- Cards: English -> Dutch ----
+with tab_en:
+    st.caption(f"Showing {len(sample_en)} of {max_n} matching entries · "
+               "read the English meaning and think of the Dutch word or phrase.")
+    for i, row in sample_en.iterrows():
+        with st.container(border=True):
+            st.markdown(f"### {row['English Translation']}")
+
+            show = st.toggle("Show answer", key=f"toggle_en_{st.session_state.seed}_{i}")
+
+            if show:
+                st.markdown(f"**Dutch:** {row['Dutch Word/Phrase']}")
+                st.markdown(f"**Voorbeeldzin:** {row['ranscribed Dutch Sentence']}")
+                st.markdown(f"*{row['Literary English Translation (for back translation)']}*")

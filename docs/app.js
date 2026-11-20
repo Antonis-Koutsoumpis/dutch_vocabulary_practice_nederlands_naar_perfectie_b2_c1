@@ -10,7 +10,8 @@ const N_OPTIONS = ["5", "10", "20", "All"];
 let S = { h: [], t: [], n: "5" };
 try { Object.assign(S, JSON.parse(localStorage.getItem("nnp-settings") || "{}")); } catch (e) { /* ignore */ }
 const save = () => { try { localStorage.setItem("nnp-settings", JSON.stringify(S)); } catch (e) { /* ignore */ } };
-let deck = [];
+let deckNl = [], deckEn = [];
+let dir = location.hash === "#en" ? "en" : "nl";   // which tab: Dutch -> English or English -> Dutch
 
 function matching() {
   return ROWS.filter((r) => (!S.h.length || S.h.includes(r.h)) && (!S.t.length || S.t.includes(r.t)));
@@ -18,17 +19,19 @@ function matching() {
 function newSet() {
   const m = matching();
   const n = S.n === "All" ? m.length : Math.min(+S.n, m.length);
-  deck = shuffle(m.slice()).slice(0, n);
+  deckNl = shuffle(m.slice()).slice(0, n);
+  deckEn = shuffle(m.slice()).slice(0, n);   // the English -> Dutch tab gets its own selection
   render();
 }
 
 function card(r) {
   const el = document.createElement("article");
   el.className = "card";
-  el.innerHTML = `<div class="card-head"><h3>${esc(r.nl)}</h3><span class="meta">H${r.h} · T${r.t}</span></div>
+  const en = dir === "en";
+  el.innerHTML = `<div class="card-head"><h3>${esc(en ? r.en : r.nl)}</h3><span class="meta">H${r.h} · T${r.t}</span></div>
     <button class="btn toggle primary">Show answer</button>
     <div class="answer" hidden>
-      <p><strong>English:</strong> ${esc(r.en)}</p>
+      <p><strong>${en ? "Dutch" : "English"}:</strong> ${esc(en ? r.nl : r.en)}</p>
       <p><strong>Voorbeeldzin:</strong> ${esc(r.ex)}</p>
       <p class="ex-en"><em>${esc(r.ex_en)}</em></p>
     </div>`;
@@ -41,7 +44,8 @@ function card(r) {
 function render() {
   const out = $("#out");
   const total = matching().length;
-  out.innerHTML = `<p class="caption">Showing ${deck.length} of ${total} matching entries.</p>`;
+  const deck = dir === "en" ? deckEn : deckNl;
+  out.innerHTML = `<p class="caption">Showing ${deck.length} of ${total} matching entries${dir === "en" ? " · read the English meaning and think of the Dutch word or phrase" : ""}.</p>`;
   if (!deck.length) { out.insertAdjacentHTML("beforeend", `<div class="notice warn-box">No words match these filters.</div>`); return; }
   const bar = document.createElement("div"); bar.className = "toolbar";
   bar.innerHTML = `<button class="btn">🔀 New set</button><button class="btn">Show all</button><button class="btn">Hide all</button>`;
@@ -77,6 +81,12 @@ function buildFilters() {
   chips("#f-t", "t", uniq("t"), false, (v) => `Tekst ${v}`);
   chips("#f-n", "n", N_OPTIONS, true);
 }
+function showTab(d, draw = true) {
+  dir = d;
+  document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-selected", b.dataset.dir === d));
+  try { history.replaceState(null, "", d === "en" ? "#en" : "#nl"); } catch (e) { /* ignore */ }
+  if (draw) { render(); window.scrollTo({ top: 0 }); }
+}
 function openSettings(open) {
   $("#settings").classList.toggle("open", open);
   $("#backdrop").hidden = !open;
@@ -93,6 +103,8 @@ fetch("data/words.json").then((r) => r.json()).then((rows) => {
   $("#closeSettings").onclick = $("#backdrop").onclick = $("#applySettings").onclick = () => openSettings(false);
   $("#resetFilters").onclick = () => { S = { h: [], t: [], n: "5" }; save(); buildFilters(); newSet(); };
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") openSettings(false); });
+  document.querySelectorAll(".tabs button").forEach((b) => { b.onclick = () => showTab(b.dataset.dir); });
+  showTab(dir, false);
   newSet();
 }).catch(() => { $("#loading").textContent = "Could not load the word list. Check your connection and reload."; });
 
