@@ -1,7 +1,7 @@
-/* Service worker: makes the app work offline and installable.
- * Strategy: serve from cache right away, update the cache in the background
- * (so a new word list shows up on the next visit). */
-const CACHE = "nnp-v5";
+/* Service worker: offline use and installation.
+ * Network first: when online, the newest version from GitHub is always shown (and saved);
+ * the saved copy is used only when offline. */
+const CACHE = "nnp-v6";
 const FILES = ["./", "index.html", "style.css", "app.js", "manifest.webmanifest",
   "data/words.json", "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
 
@@ -16,13 +16,11 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin) return;
-  e.respondWith(caches.open(CACHE).then(async (cache) => {
-    const cached = await cache.match(e.request, { ignoreSearch: true });
-    const fresh = fetch(e.request).then((res) => {
-      if (res.ok) cache.put(e.request, res.clone());
+  e.respondWith(
+    // "no-cache": ask GitHub whether the file changed, instead of using the browser's copy
+    fetch(e.request.url, { cache: "no-cache" }).then((res) => {
+      if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); }
       return res;
-    }).catch(() => cached);
-    if (cached) { e.waitUntil(fresh); return cached; }
-    return fresh;
-  }));
+    }).catch(() => caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || caches.match("./")))
+  );
 });
